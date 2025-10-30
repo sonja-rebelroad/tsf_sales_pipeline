@@ -1,0 +1,5 @@
+tab,element,type,query_or_range,notes
+Daily Summary,KPIs,table,=Sales!A1:H20,"Yesterday, MTD, QTD"
+Daily Summary,Trend,chart,=Sales!A1:H200,"Revenue & Orders last 30 days"
+Cumulative,Channel Mix,chart,=Channel!A1:E200,"% revenue by channel"
+Cumulative,Promo Performance,table,=Promos!A1:G200,"Code, sales, discount$, CAC est."

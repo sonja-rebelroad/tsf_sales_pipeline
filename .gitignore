@@ -1,0 +1,24 @@
+# Ignore virtual environments
+.venv/
+
+# Ignore caches and compiled files
+__pycache__/
+*.pyc
+
+# Ignore local data and logs
+data/raw/
+data/processed/
+logs/
+*.log
+
+# Ignore config secrets
+config/.env
+config/service_account.json
+
+# Ignore VS Code settings and OS junk
+.vscode/
+Thumbs.db
+.DS_Store
+
+# Ignore Google Drive shortcuts
+*.gsheet

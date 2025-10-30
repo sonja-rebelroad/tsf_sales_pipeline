@@ -1,0 +1,3 @@
+promo_code,promo_type,promo_pct_of_sales,channel,notes
+BFCM25,percent,0.25,Shopify Online Store,"Black Friday 25% Off"
+BOGOCHICKEN,bogo,0.50,Shopify Online Store,"Buy One Get One (COGS logic TBD)"

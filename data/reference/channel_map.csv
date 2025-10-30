@@ -1,0 +1,17 @@
+source_key,channel,sub_channel
+web,Shopify,Online Store
+pos,Shopify,POS
+draft_order,Shopify,Draft
+shopify_draft_ord,Shopify,Manual/Draft
+meta,Shopify,Facebook / Instagram Shop
+wholesale,Shopify,Wholesale / B2B
+manual,Shopify,Manual Entry
+internal_test,Shopify,Internal/Test Orders
+amazon,Amazon,Marketplace
+amazon_ads,Amazon,Ads / Sponsored
+tiktok,TikTok,Shop
+tiktok_ads,TikTok,Paid Campaign
+meta,Facebook / Instagram Shop,
+wholesale,Wholesale / B2B,
+manual,Manual Entry,
+internal_test,Internal/Test Orders,
