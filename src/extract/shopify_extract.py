@@ -8,14 +8,22 @@ from dotenv import load_dotenv
 from utils import logging as log
 
 # -------------------------------------------------------------------
-# 🔧 Load environment and constants
+# 🔧 Load environment and constants (works both locally and in GitHub Actions)
 # -------------------------------------------------------------------
-load_dotenv(os.path.join("config", ".env"))
 
+# Load .env for local runs
+if os.path.exists(os.path.join("config", ".env")):
+    load_dotenv(os.path.join("config", ".env"))
+
+# Read Shopify credentials from either .env or GitHub Secrets (env vars)
 SHOP = os.getenv("SHOPIFY_STORE_DOMAIN")
 TOKEN = os.getenv("SHOPIFY_API_TOKEN")
 API_VERSION = os.getenv("SHOPIFY_API_VERSION", "2024-10")
 
+if not SHOP or not TOKEN:
+    raise ValueError("❌ Missing Shopify credentials — check .env or GitHub Secrets.")
+
+# Create raw data folder
 RAW_DIR = os.path.join("data", "raw", "shopify")
 os.makedirs(RAW_DIR, exist_ok=True)
 
@@ -24,8 +32,6 @@ os.makedirs(RAW_DIR, exist_ok=True)
 # -------------------------------------------------------------------
 def fetch_orders(since=None, until=None, status="any", limit=250):
     """Fetch all orders from Shopify between given timestamps."""
-    assert SHOP and TOKEN, "Missing SHOPIFY credentials in .env"
-
     base = f"https://{SHOP}/admin/api/{API_VERSION}/orders.json"
     params = {
         "status": status,
