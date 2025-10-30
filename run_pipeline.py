@@ -1,7 +1,7 @@
-# run_pipeline.py
 import os, sys, subprocess, time, traceback
 from datetime import datetime
 from pathlib import Path
+import requests
 
 # --- Locate project root ---
 PROJECT_ROOT = Path(__file__).resolve().parent
@@ -15,7 +15,10 @@ if str(SRC_DIR) not in sys.path:
 
 from utils import logging as log
 
-# --- Logging setup ---
+
+# -------------------------------------------------------------------
+# 🪶 Logging setup
+# -------------------------------------------------------------------
 def log_msg(msg):
     ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     line = f"[{ts}] {msg}"
@@ -23,21 +26,29 @@ def log_msg(msg):
     with open(LOG_DIR / "scheduler_log.txt", "a", encoding="utf-8") as f:
         f.write(line + "\n")
 
-# --- Optional delay to allow Drive to mount ---
-log_msg("🕓 Waiting 20 seconds for Drive mount...")
-time.sleep(20)
 
-# --- Detect virtual environment ---
-venv_python = PROJECT_ROOT / ".venv" / "Scripts" / "python.exe"
-python_exec = str(venv_python if venv_python.exists() else sys.executable)
-log_msg(f"🐍 Using Python interpreter: {python_exec}")
-
-# --- Slack alert helper ---
-def notify_slack(text):
+# -------------------------------------------------------------------
+# 🌐 Environment setup for GitHub or local
+# -------------------------------------------------------------------
+def load_env():
+    """Load .env locally or rely on GitHub secrets in CI."""
     try:
         from dotenv import load_dotenv
-        import requests
-        load_dotenv(PROJECT_ROOT / "config" / ".env")
+        env_path = PROJECT_ROOT / "config" / ".env"
+        if env_path.exists():
+            load_dotenv(env_path)
+            log_msg(f"📄 Loaded .env from {env_path}")
+        else:
+            log_msg("🌐 No .env found — using GitHub Action environment.")
+    except Exception as e:
+        log_msg(f"⚠️ Could not load .env: {e}")
+
+
+# -------------------------------------------------------------------
+# 🔔 Slack alert helper
+# -------------------------------------------------------------------
+def notify_slack(text):
+    try:
         url = os.getenv("SLACK_WEBHOOK_URL")
         if not url:
             log_msg("⚠️ No SLACK_WEBHOOK_URL found — skipping Slack alert.")
@@ -47,10 +58,12 @@ def notify_slack(text):
     except Exception as e:
         log_msg(f"⚠️ Slack alert failed: {e}")
 
-# --- Run a stage ---
+
+# -------------------------------------------------------------------
+# 🧩 Run a single pipeline stage
+# -------------------------------------------------------------------
 def run_stage(module, func):
     import importlib
-    import src.utils.logging as log
     log_msg(f"🚀 Starting stage: {module}.{func}")
     try:
         m = importlib.import_module(module)
@@ -61,13 +74,21 @@ def run_stage(module, func):
         tb = traceback.format_exc()
         log_msg(f"❌ Stage failed: {module} — {e}")
         log_msg(tb)
-        notify_slack(f"❌ TSF Sales Pipeline FAILED\n• Stage: {module}\n• Error: {e}\n```\n{tb[-4000:]}\n```")
+        notify_slack(
+            f"❌ TSF Sales Pipeline FAILED\n• Stage: {module}\n• Error: {e}\n```\n{tb[-4000:]}\n```"
+        )
         return False
 
+
+# -------------------------------------------------------------------
+# 🚀 Main orchestrator
+# -------------------------------------------------------------------
 def main():
     start = datetime.now()
     log_msg(f"🧙 TSF Sales Pipeline started at {start}")
-    log_msg(f"📂 Current working directory: {os.getcwd()}")
+    log_msg(f"📂 Working directory: {os.getcwd()}")
+
+    load_env()
 
     stages = [
         ("src.extract.shopify_extract", "run_extract"),
@@ -85,8 +106,13 @@ def main():
     elapsed = end - start
     msg = f"✨ Pipeline finished at {end} (duration: {elapsed})"
     log_msg(msg)
+
     if success:
         notify_slack(f"✅ TSF Sales Pipeline completed successfully in {elapsed}.")
 
+
+# -------------------------------------------------------------------
+# 🧪 Entry point
+# -------------------------------------------------------------------
 if __name__ == "__main__":
     main()
