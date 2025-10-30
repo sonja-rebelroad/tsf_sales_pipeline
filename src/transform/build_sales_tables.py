@@ -6,6 +6,13 @@ from datetime import datetime, timedelta, UTC
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 from src.utils import logging as log
 
+# -------------------------------------------------------------------
+# 🔧 Ensure directories exist (important for GitHub Actions)
+# -------------------------------------------------------------------
+os.makedirs(os.path.join("data", "raw", "shopify"), exist_ok=True)
+os.makedirs(os.path.join("data", "processed"), exist_ok=True)
+os.makedirs(os.path.join("data", "reference"), exist_ok=True)
+
 RAW_DIR  = os.path.join("data", "raw", "shopify")
 PROC_DIR = os.path.join("data", "processed")
 REF_DIR  = os.path.join("data", "reference")
