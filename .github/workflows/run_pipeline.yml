@@ -30,6 +30,10 @@ jobs:
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          SHOPIFY_STORE_DOMAIN: ${{ secrets.SHOPIFY_STORE_DOMAIN }}
+          SHOPIFY_API_TOKEN: ${{ secrets.SHOPIFY_API_TOKEN }}
+          SHOPIFY_API_VERSION: ${{ secrets.SHOPIFY_API_VERSION }}
+          GOOGLE_SHEETS_WORKBOOK_NAME: ${{ secrets.GOOGLE_SHEETS_WORKBOOK_NAME }}
         run: |
           echo "🚀 Starting TSF Sales Pipeline"
           python run_pipeline.py
@@ -41,3 +45,11 @@ jobs:
         with:
           name: processed-data
           path: data/processed/
+
+      # 👇 Upload logs as artifact for inspection on GitHub
+      - name: Upload logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: logs/
